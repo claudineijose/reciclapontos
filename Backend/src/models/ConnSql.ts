@@ -1,4 +1,6 @@
+import cfg from 'config';
 class ConnSql {
+    //this.config =  cfg.get('server.port');
     static config = {
         user: 'sa',
         password: '8k3W2C2BVzAW9p',
@@ -16,7 +18,7 @@ class ConnSql {
             //Gravação de Log
             console.log(err);
         }
-    }    
+    }
 }
 
 export default ConnSql;

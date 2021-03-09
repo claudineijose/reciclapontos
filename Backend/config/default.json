@@ -1,5 +1,13 @@
 {
-    "server": {
-      "port" : 3000
-    }
-  }
+	"server": {
+		"port": 3000
+	},
+	"connectionString": {
+		"user": "sa",
+		"password": "8k3W2C2BVzAW9p",
+		"server": "localhost",
+		"database": "RECICLAPONTOS",
+		"port": 1420,
+		"enableArithAbort": true
+	}
+}
