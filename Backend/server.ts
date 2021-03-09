@@ -1,4 +1,4 @@
-import App from './config/app';
+import App from './app';
 import UserController from './src/controllers/user/user';
 import LoginController from './src/controllers/login/login';
 const app = new App(

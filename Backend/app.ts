@@ -1,13 +1,17 @@
+import * as dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
 import express from 'express';
-import cfg from 'config';
-import Controller from '../src/models/Controller';
+import Controller from './src/models/Controller';
 
 class App {
     public app: express.Application;
     public port: string;
 
     constructor(controllers: Array<Controller>) {
-        this.port = process.env.PORT || cfg.get('server.port');
+        dotenv.config();
+
+        this.port = process.env.PORT || "3000";
         this.app = express();
         /*SETA A PORTA DA API*/
         this.app.set('port', this.port);
@@ -18,6 +22,8 @@ class App {
     }
 
     private initializeMiddlewares() {
+        this.app.use(helmet());
+        this.app.use(cors());
         this.app.use(express.json());
     }
 
