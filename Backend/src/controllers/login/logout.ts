@@ -1,5 +1,5 @@
 import * as express from 'express';
-import Controller from '../../models/Controller';
+import Controller from '../../infra/controller';
 
 class LogoutController implements Controller {
     public path = '/logout';

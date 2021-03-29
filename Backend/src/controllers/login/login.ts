@@ -1,6 +1,5 @@
 import * as express from 'express';
-import Controller from '../../models/Controller';
-
+import Controller from '../../infra/controller';
 class LoginController implements Controller {
     public path = '/login';
     public router = express.Router();
@@ -11,11 +10,17 @@ class LoginController implements Controller {
 
     public intializeRoutes() {
         this.router.post(this.path, this.post);
+        this.router.get(this.path, this.get);
     }
 
-    post = async (req: express.Request, res: express.Response) => {
-        
+    public async post(req: express.Request, res: express.Response) {
+        res.send(false);
+    }
+
+    get = async (req: express.Request, res: express.Response) => {
+
     }
 }
 
 export default LoginController;
+

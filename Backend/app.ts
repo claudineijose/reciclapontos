@@ -2,8 +2,8 @@ import * as dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import express from 'express';
-import Controller from './src/models/Controller';
-
+import Controller from './src/infra/controller';
+import "reflect-metadata";
 class App {
     public app: express.Application;
     public port: string;
@@ -24,7 +24,9 @@ class App {
     private initializeMiddlewares() {
         this.app.use(helmet());
         this.app.use(cors());
-        this.app.use(express.json());
+         // Required for POST requests
+         this.app.use(express.json());
+         this.app.use(express.urlencoded({ extended: true }));
     }
 
     private initializeControllers(controllers: Array<Controller>) {
@@ -39,12 +41,4 @@ class App {
         });
     }
 }
-
 export default App;
-
-// export default () => {
-//     return express()
-//         .set('port', process.env.PORT || cfg.get('server.port'))
-//         .use(express.json());
-// };
-

@@ -1,29 +1,63 @@
-CREATE TABLE Usuario (
-	Id BIGINT IDENTITY(1,1),
-	Nome VARCHAR(50),
-	Email VARCHAR(100),
-	DataAlteracao SMALLDATETIME,
-	CONSTRAINT PK_Usuario PRIMARY KEY (Id)
-)
+CREATE TABLE [dbo].[Address](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[UserId] [bigint] NULL,
+	[Type] [char](1) NULL,
+	[Zip] [varchar](9) NULL,
+	[Address] [varchar](50) NULL,
+	[Complement] [varchar](100) NULL,
+	[City] [varchar](50) NULL,
+	[State] [varchar](2) NULL,
+	[Reference] [varchar](1000) NULL,
+ CONSTRAINT [PK_Address] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 
-CREATE TABLE TipoAutenticacao (
-	UsuarioId BIGINT,
-	Tipo CHAR(1) CHECK (Tipo IN ('F', 'G', 'S')), -- F - Facebook, G - Gmail, S - Autenticação com Senha
-	Senha VARCHAR(1000),
-	CONSTRAINT PK_TipoAutenticao PRIMARY KEY (UsuarioId, Tipo),
-	CONSTRAINT FK_TipoAutenticacao_Usuario FOREIGN KEY (UsuarioId) REFERENCES Usuario (Id)	
-)
+ALTER TABLE [dbo].[Address]  WITH CHECK ADD  CONSTRAINT [FK_Address_User] FOREIGN KEY([UserId])
+REFERENCES [dbo].[User] ([Id])
+GO
 
-CREATE TABLE Endereco(
-	Id BIGINT IDENTITY(1,1),
-	UsuarioId BIGINT,
-	Tipo CHAR(1) CHECK (Tipo IN ('R', 'C', 'O')), -- R - Residencial, C - Comercial, O - Outros
-	CEP VARCHAR(9),
-	Endereco VARCHAR(50),
-	Complemento VARCHAR(100),
-	Cidade VARCHAR(50),
-	Estado VARCHAR(2),
-	Referencia VARCHAR(1000),
-	CONSTRAINT PK_Endereco PRIMARY KEY (Id),
-	CONSTRAINT FK_Endereco_Usuario FOREIGN KEY (UsuarioId) REFERENCES Usuario (Id)
-)
+ALTER TABLE [dbo].[Address] CHECK CONSTRAINT [FK_Address_User]
+GO
+
+ALTER TABLE [dbo].[Address]  WITH CHECK ADD CHECK [Address_Check](([Type]='O' OR [Type]='C' OR [Type]='R'))
+GO
+
+CREATE TABLE [dbo].[AuthType](
+	[UserId] [bigint] NOT NULL,
+	[Type] [char](1) NOT NULL,
+	[Password] [varchar](1000) NULL,
+ CONSTRAINT [PK_AuthType] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC,
+	[Type] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[AuthType]  WITH CHECK ADD  CONSTRAINT [FK_AuthType_User] FOREIGN KEY([UserId])
+REFERENCES [dbo].[User] ([Id])
+GO
+
+ALTER TABLE [dbo].[AuthType] CHECK CONSTRAINT [FK_AuthType_User]
+GO
+
+ALTER TABLE [dbo].[AuthType] ADD CONSTRAINT [AuthType_CK_01] CHECK  (([Type]='P' OR [Type]='G' OR [Type]='F'))
+
+GO
+
+CREATE TABLE [dbo].[User](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Cpf] [varchar](14) NULL,
+	[Name] [varchar](50) NULL,
+	[Email] [varchar](100) NULL,
+	[UpdateDate] [smalldatetime] NULL,
+ CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
