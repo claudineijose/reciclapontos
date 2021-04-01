@@ -67,7 +67,7 @@ export class User {
         this.Id = id || 0;
         this.Name = name || "";
         this.Cpf = cpf || "";
-        this.Birthday = birthday;
+        this.Birthday = birthday || new Date();
         this.Rg = rg || "";
         this.Mobile = mobile || "";
         this.Phone = phone || "";

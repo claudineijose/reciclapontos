@@ -1,4 +1,4 @@
-import { AddressUser, AUTHTYPE, AuthTypeUser, User } from '../models/user/user';
+import { AddressUser, AUTHTYPE, AuthTypeUser, User } from '../models/user/User';
 import { UserRepository } from '../repositories/UserRepository';
 import bcrypt from 'bcrypt';
 

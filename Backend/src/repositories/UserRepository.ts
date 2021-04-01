@@ -1,7 +1,7 @@
 import loadSqlQueries from '../infra/loadSql';
 import SqlConn from '../infra/database';
 import sql from 'mssql';
-import { User, AddressUser, AuthTypeUser } from '../models/user/user';
+import { User, AddressUser, AuthTypeUser } from '../models/user/User';
 
 export class UserRepository {
     private folderName = "user";
