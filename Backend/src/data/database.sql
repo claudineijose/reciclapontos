@@ -4,7 +4,9 @@ CREATE TABLE [dbo].[Address](
 	[Type] [char](1) NULL,
 	[Zip] [varchar](9) NULL,
 	[Address] [varchar](50) NULL,
+	[Number] [varchar]](8) NULL,
 	[Complement] [varchar](100) NULL,
+	[District] [varchar](30) NULL,
 	[City] [varchar](50) NULL,
 	[State] [varchar](2) NULL,
 	[Reference] [varchar](1000) NULL,
@@ -50,9 +52,13 @@ GO
 
 CREATE TABLE [dbo].[User](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Cpf] [varchar](14) NULL,
+	[CPF] [varchar](14) NULL,
+	[RG] [varchar](14) NULL,
 	[Name] [varchar](50) NULL,
 	[Email] [varchar](100) NULL,
+	[Birthday] [smalldatetime] NULL,
+	[Mobile] [varchar] (14),
+	[Phone] [varchar] (14),
 	[UpdateDate] [smalldatetime] NULL,
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (

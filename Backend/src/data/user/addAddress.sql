@@ -3,7 +3,9 @@ INSERT INTO [dbo].[Address]
            ,[Type]
            ,[Zip]
            ,[Address]
+           ,[Number]
            ,[Complement]
+           ,[District]
            ,[City]
            ,[State]
            ,[Reference])
@@ -12,7 +14,9 @@ INSERT INTO [dbo].[Address]
            ,@Type
            ,@Zip
            ,@Address
+           ,@Number
            ,@Complement
+           ,@District
            ,@City
            ,@State
            ,@Reference)

@@ -3,19 +3,30 @@ SELECT U.[Id]
       ,U.[Cpf]
       ,U.[Email]
       ,U.[UpdateDate]
-	  ,T.[Type] AS [AuthType]
+	  ,U.[RG]
+	  ,U.[Birthday]
+	  ,U.[Mobile]
+	  ,U.[Phone]
+FROM [dbo].[User] U
+WHERE
+    U.[Id] = @Id
+
+SELECT T.[Type] AS [AuthType]
       ,T.[Password]
+FROM [dbo].[AuthType] T 
+WHERE
+	T.[UserId] = @Id
+
+SELECT A.[Id]
       ,A.[Type] AS [AddressType]
       ,A.[Zip]
       ,A.[Address]
+      ,A.[Number]
       ,A.[Complement]
+      ,A.[District]
       ,A.[City]
       ,A.[State]
       ,A.[Reference]
-FROM [dbo].[User] U
-LEFT JOIN [dbo].[AuthType] T ON U.[Id] = T.[UserId] 
-LEFT JOIN [dbo].[Address] A ON U.[Id] = A.[UserId] 
+FROM [dbo].[Address] A 
 WHERE
-    U.[Id] = @Id
-ORDER BY
-    U.[Id] 
+	A.[UserId] = @Id  

@@ -4,6 +4,10 @@ INSERT INTO [dbo].[User]
     ,[Cpf]
     ,[Email]
     ,[UpdateDate]
+    ,[RG]
+    ,[Birthday]
+    ,[Mobile]
+    ,[Phone]
 )
 VALUES
 (
@@ -11,5 +15,9 @@ VALUES
     ,@Cpf
     ,@Email
     ,GETDATE()
+    ,@RG
+    ,@Birthday
+    ,@Mobile
+    ,@Phone
 )
 SELECT @@IDENTITY as ID
