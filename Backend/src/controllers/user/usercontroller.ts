@@ -1,9 +1,13 @@
 import * as express from 'express';
 import Controller from '../../infra/controller';
 import { check, param, validationResult } from 'express-validator';
-import { ADDRESSTYPE, AddressUser, AUTHTYPE, AuthTypeUser, User } from '../../models/user/User';
-import { UserService } from '../../services/UserService';
+import { ADDRESSTYPE, AddressUser, AUTHTYPE, AuthTypeUser, User } from '../../models/user/user';
+import { UserService } from '../../services/userservice';
 import { ValidarCpf } from '../../infra/util';
+import passport from 'passport';
+import logger from '../../infra/logger';
+
+const passportJWT = passport.authenticate('jwt', { session: false });
 
 class UserController implements Controller {
     public path = '/user';
@@ -84,6 +88,7 @@ class UserController implements Controller {
 
         this.router.put(
             this.path,
+            passportJWT,
             check('id')
                 .exists({ checkNull: true, checkFalsy: true })
                 .withMessage('Id é de preenchimento obrigatório'),
@@ -92,6 +97,7 @@ class UserController implements Controller {
             this.update);
 
         this.router.post(`${this.path}/:id/authtype`,
+            passportJWT,
             param('id')
                 .exists({ checkNull: true, checkFalsy: true })
                 .withMessage('Id é de preenchimento obrigatório')
@@ -109,6 +115,7 @@ class UserController implements Controller {
             this.updateAuthType);
 
         this.router.put(`${this.path}/:id/password`,
+            passportJWT,
             param('id')
                 .isNumeric()
                 .withMessage("Id é do tipo Numérico.")
@@ -136,6 +143,7 @@ class UserController implements Controller {
             this.updatePassword);
 
         this.router.put(`${this.path}/:id/address/:idaddress`,
+            passportJWT,
             param('id')
                 .isNumeric()
                 .withMessage("Id com valor inválido.")
@@ -151,13 +159,21 @@ class UserController implements Controller {
                 .isNumeric()
                 .withMessage("Id do Endereço é do tipo Numérico.")
                 .custom(async (idaddress, meta) => {
-                    const { id } = meta.req.params;
-                    const user = await new UserService().findById(parseInt(id));
-                    if (user && !user.Addresses.find(f => f.Id == parseInt(idaddress))) {
+                    const { id } = <any>meta.req.params;
+                    if (id) {
+                        const user = await new UserService().findById(parseInt(id));
+                        if (user && !user.Addresses.find(f => f.Id == parseInt(idaddress))) {
+                            return new Promise((_, reject) => {
+                                reject("Endereço não localizado");
+                            });
+                        }
+                    }
+                    else {
                         return new Promise((_, reject) => {
                             reject("Endereço não localizado");
                         });
                     }
+
                 }),
             check("type")
                 .isIn(["O", "C", "R"])
@@ -165,6 +181,7 @@ class UserController implements Controller {
             this.updateAddress);
 
         this.router.delete(`${this.path}/id/:id`,
+            passportJWT,
             param('id')
                 .isEmpty()
                 .withMessage('Id é de preenchimento obrigatório')
@@ -182,10 +199,12 @@ class UserController implements Controller {
 
         this.router.get(
             `${this.path}/id/:id`,
+            passportJWT,
             this.getId);
 
         this.router.get(
             `${this.path}/email/:email`,
+            passportJWT,
             param('email')
                 .isEmail()
                 .withMessage("E-mail inválido"),
@@ -198,10 +217,10 @@ class UserController implements Controller {
         let types = new Array<AuthTypeUser>();
         for (let index = 0; index < authType.length; index++) {
             const element = authType[index];
-            const { type, password } = element
+            const { type, password, oauthId, email } = element
             let auth: AUTHTYPE = type as AUTHTYPE;
 
-            types.push(new AuthTypeUser(auth, password));
+            types.push(new AuthTypeUser(auth, password, oauthId, email));
         }
 
         let addr = new Array<AddressUser>();
@@ -239,11 +258,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao Incluir. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao Incluir. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     };
 
@@ -269,7 +289,7 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao Atualizar. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
@@ -307,11 +327,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao selecionar por E-mail. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao selecionar por E-mail. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     }
 
@@ -332,11 +353,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao selecionar por E-mail. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao selecionar por E-mail. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     }
 
@@ -352,10 +374,10 @@ class UserController implements Controller {
             let types = new Array<AuthTypeUser>();
             for (let index = 0; index < authType.length; index++) {
                 const element = authType[index];
-                const { type, password } = element
+                const { type, password, oauthId, email } = element
                 let auth: AUTHTYPE = type as AUTHTYPE;
 
-                types.push(new AuthTypeUser(auth, password));
+                types.push(new AuthTypeUser(auth, password, oauthId, email));
             }
             new UserService().updateAuthType(parseInt(id), types).
                 then((ret) => {
@@ -364,11 +386,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao Incluir. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao Incluir. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     }
 
@@ -389,11 +412,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao atualizar. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao Incluir. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     }
 
@@ -413,11 +437,12 @@ class UserController implements Controller {
                 }).
                 catch((err) => {
                     res.status(500).send(`Falha ao atualizar. Mensagem: ${err.message} ${err.stack}`);
-                    console.log(err.message);
+                    logger.error(err.message);
                 });
         }
         catch (err) {
             res.status(500).send(`Falha ao atualizar. Mensagem: ${err.message} ${err.stack}`);
+            logger.error(err.message);
         }
     }
 }

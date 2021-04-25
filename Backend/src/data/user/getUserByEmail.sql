@@ -13,6 +13,8 @@ WHERE
 
 SELECT T.[Type] AS [AuthType]
       ,T.[Password]
+      ,T.[OAuthId]
+      ,T.[Email]
 FROM [dbo].[AuthType] T 
 INNER JOIN [dbo].[User] U ON U.[Id] = T.[UserId] 
 WHERE

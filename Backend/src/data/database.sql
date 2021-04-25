@@ -31,6 +31,8 @@ CREATE TABLE [dbo].[AuthType](
 	[UserId] [bigint] NOT NULL,
 	[Type] [char](1) NOT NULL,
 	[Password] [varchar](1000) NULL,
+	[OAuthId] [varchar](1000) NULL,
+	[Email] [varchar](100) NULL
  CONSTRAINT [PK_AuthType] PRIMARY KEY CLUSTERED 
 (
 	[UserId] ASC,

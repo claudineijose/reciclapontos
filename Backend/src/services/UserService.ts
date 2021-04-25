@@ -1,5 +1,5 @@
-import { AddressUser, AUTHTYPE, AuthTypeUser, User } from '../models/user/User';
-import { UserRepository } from '../repositories/UserRepository';
+import { AddressUser, AUTHTYPE, AuthTypeUser, User } from '../models/user/user';
+import { UserRepository } from '../repositories/userrepository';
 import bcrypt from 'bcrypt';
 
 export class UserService {
@@ -72,9 +72,12 @@ export class UserService {
     async updateAddress(addresses: AddressUser): Promise<boolean | null> {
         return await new UserRepository().updateAddress(addresses);
     }
-    
+
     async getAddressByUserId(id: number): Promise<Array<AddressUser> | null> {
         return await new UserRepository().getAddressByUserId(id);
     }
 
+    async getUserByAuthType(email: string, type: AUTHTYPE): Promise<AuthTypeUser | null> {
+        return await new UserRepository().getByAuthType(email, type);
+    }
 }

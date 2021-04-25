@@ -1,7 +1,6 @@
 export enum AUTHTYPE {
     PASSWORD = "P",
-    FACEBOOK = "F",
-    GOOGLE = "G"
+    FACEBOOK = "F"
 }
 
 export enum ADDRESSTYPE {
@@ -12,10 +11,16 @@ export enum ADDRESSTYPE {
 export class AuthTypeUser {
     Type: AUTHTYPE;
     Password: string;
+    OAuthId: string;
+    Email: string;
+    UserId: number | null;
 
-    constructor(type?: AUTHTYPE, password?: string) {
+    constructor(type?: AUTHTYPE, password?: string, oauthId?: string, email?: string, userId?: number) {
         this.Password = password || "";
         this.Type = type || AUTHTYPE.PASSWORD;
+        this.OAuthId = oauthId || "";
+        this.Email = email || "";
+        this.UserId = userId || null;
     }
 }
 
@@ -50,11 +55,11 @@ export class User {
     Name: string;
     Cpf: string;
     Rg: string;
-    Birthday: Date;
+    Birthday: Date | undefined;
     Mobile: string;
     Phone: string;
     Email: string;
-    UpdateDate: Date;
+    UpdateDate: Date | undefined;
     AuthType: Array<AuthTypeUser>;
     Addresses: Array<AddressUser>;
 
@@ -67,12 +72,12 @@ export class User {
         this.Id = id || 0;
         this.Name = name || "";
         this.Cpf = cpf || "";
-        this.Birthday = birthday || new Date();
+        this.Birthday = birthday;
         this.Rg = rg || "";
         this.Mobile = mobile || "";
         this.Phone = phone || "";
         this.Email = email || "";
-        this.UpdateDate = updateDate || new Date();
+        this.UpdateDate = updateDate || undefined;
         this.AuthType = authType || new Array<AuthTypeUser>();
         this.Addresses = addresses || new Array<AddressUser>();
     }

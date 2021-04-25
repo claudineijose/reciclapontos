@@ -1,8 +1,12 @@
 INSERT INTO [dbo].[AuthType]
            ([UserId]
            ,[Type]
-           ,[Password])
+           ,[Password]
+           ,[OAuthId]
+           ,[Email])
      VALUES
            (@UserId
            ,@Type
-           ,@Password)
+           ,@Password
+           ,@OAuthId
+           ,@Email)

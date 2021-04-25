@@ -3,16 +3,18 @@ SELECT U.[Id]
       ,U.[Cpf]
       ,U.[Email]
       ,U.[UpdateDate]
-	  ,U.[RG]
-	  ,U.[Birthday]
-	  ,U.[Mobile]
-	  ,U.[Phone]
+	,U.[RG]
+	,U.[Birthday]
+	,U.[Mobile]
+	,U.[Phone]
 FROM [dbo].[User] U
 WHERE
     U.[Id] = @Id
 
 SELECT T.[Type] AS [AuthType]
       ,T.[Password]
+      ,T.[OAuthId]
+      ,T.[Email]
 FROM [dbo].[AuthType] T 
 WHERE
 	T.[UserId] = @Id

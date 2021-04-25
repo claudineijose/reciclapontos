@@ -1,7 +1,7 @@
 import loadSqlQueries from '../infra/loadSql';
 import SqlConn from '../infra/database';
 import sql from 'mssql';
-import { User, AddressUser, AuthTypeUser } from '../models/user/User';
+import { User, AddressUser, AuthTypeUser, AUTHTYPE } from '../models/user/User';
 
 export class UserRepository {
     private folderName = "user";
@@ -18,6 +18,7 @@ export class UserRepository {
     private updPassword = "updpassword";
     private updAddress = "updaddress";
     private getAddressByUser = "getaddressbyuserid";
+    private getUserByAuthType = "getuserbyauthtype";
 
     private async getRequest(): Promise<any> {
         const con = await SqlConn.getConn();
@@ -31,14 +32,8 @@ export class UserRepository {
         let authType = new Array<AuthTypeUser>();
         for (let index = 0; index < dataUser.recordsets[1].length; index++) {
             const element = dataUser.recordsets[1][index];
-
-            const { AuthType, Password } = element;
-
-            let auth = new AuthTypeUser();
-            auth.Password = Password;
-            auth.Type = AuthType;
-
-            authType.push(auth);
+            const { AuthType, Password, OAuthId, Email } = element;
+            authType.push(new AuthTypeUser(AuthType, Password, OAuthId, Email));
         }
 
         let addresses = Array<AddressUser>();
@@ -104,6 +99,8 @@ export class UserRepository {
                 reqAddAuth.input("UserId", sql.Int, id);
                 reqAddAuth.input("Type", sql.VarChar(1), element.Type);
                 reqAddAuth.input("Password", sql.VarChar(1000), element.Password);
+                reqAddAuth.input("OAuthId", sql.VarChar(1000), element.OAuthId);
+                reqAddAuth.input("Email", sql.VarChar(100), element.Email);
                 await reqAddAuth.query(query);
             }
 
@@ -180,6 +177,19 @@ export class UserRepository {
         return null;
     }
 
+    async getByAuthType(email: string, type: AUTHTYPE): Promise<AuthTypeUser | null> {
+        const request = await this.getRequest();
+        request.input("Email", sql.VarChar(100), email);
+        request.input("Type", sql.VarChar(1), type);
+        var query: any = await loadSqlQueries(this.folderName, this.getUserByAuthType);
+        var ret = await request.query(query);
+        if (ret.recordsets[0].length > 0) {
+            const item = ret.recordsets[0][0];
+            return new AuthTypeUser(item.AuthType, item.Password, item.OAuthId, item.Email, item.UserId);
+        }
+        return null;
+    }
+
     async getByCpf(cpf: string): Promise<User | null> {
         const request = await this.getRequest();
         request.input("Cpf", sql.VarChar(14), cpf);
@@ -247,6 +257,8 @@ export class UserRepository {
                 reqAddAuth.input("UserId", sql.Int, id);
                 reqAddAuth.input("Type", sql.VarChar(1), element.Type);
                 reqAddAuth.input("Password", sql.VarChar(1000), element.Password);
+                reqAddAuth.input("OAuthId", sql.VarChar(1000), element.OAuthId);
+                reqAddAuth.input("Email", sql.VarChar(100), element.Email);
                 await reqAddAuth.query(query);
             }
             transaction.commit();

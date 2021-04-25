@@ -1,4 +1,5 @@
 import * as sql from 'mssql';
+import logger from './logger';
 
 export default class SqlConn {
     private static pool: any;
@@ -9,7 +10,7 @@ export default class SqlConn {
             SqlConn.pool = null;
         }
         catch (err: any) {
-            console.log(err);
+            logger.error(err.message);
         }
     };
 
@@ -23,7 +24,7 @@ export default class SqlConn {
                 password: process.env.SQL_PASSWORD,
                 server: process.env.SQL_SERVER || "localhost",
                 database: process.env.SQL_DATABASE,
-                port: parseInt(process.env.SQL_PORT || 1430),
+                port: parseInt(process.env.SQL_PORT || "1430", 10),
                 options: {
                     enableArithAbort: true,
                     encrypt: true
@@ -31,19 +32,19 @@ export default class SqlConn {
             };
             SqlConn.pool = await new sql.ConnectionPool(config, (err) => {
                 if (err) {
-                    console.log(err);
+                    logger.error(err.message);
                 }
             });
             await SqlConn.pool.connect();
 
             SqlConn.pool.on("error", async (err: any) => {
-                console.log(err);
+                logger.error(err.message);
                 SqlConn.closePool();
             });
             return SqlConn.pool;
         }
         catch (err: any) {
-            console.log(err);
+            logger.error(err.message);
             SqlConn.pool = null;
         }
     };
