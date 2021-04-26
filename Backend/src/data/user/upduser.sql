@@ -3,7 +3,6 @@ UPDATE
 SET 
 	[Name] = @Name
 	,[Cpf] = @Cpf
-    ,[Email] = @Email
     ,[UpdateDate] = GETDATE()
 	,[RG] = @RG
     ,[Birthday] = @Birthday

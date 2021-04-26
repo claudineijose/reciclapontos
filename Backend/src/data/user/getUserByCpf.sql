@@ -1,7 +1,6 @@
 SELECT U.[Id]
       ,U.[Name]
       ,U.[Cpf]
-      ,U.[Email]
       ,U.[UpdateDate]
 	,U.[RG]
 	,U.[Birthday]

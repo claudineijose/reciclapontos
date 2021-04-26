@@ -49,17 +49,18 @@ export class UserService {
         return await new UserRepository().getByCpf(cpf);
     }
 
-    async updateAuthType(id: number, auth: Array<AuthTypeUser>): Promise<boolean | null> {
-        for (let index = 0; index < auth.length; index++) {
-            const element = auth[index];
-            if (element.Type == AUTHTYPE.PASSWORD) {
-                const passwordHash = bcrypt.hashSync(element.Password, 10);
-                element.Password = passwordHash;
+    async updateAuthType(id: number, auth: Array<AuthTypeUser>, cryptPassword: boolean = true): Promise<boolean | null> {
+        if (cryptPassword){
+            for (let index = 0; index < auth.length; index++) {
+                const element = auth[index];
+                if (element.Type == AUTHTYPE.PASSWORD) {
+                    const passwordHash = bcrypt.hashSync(element.Password, 10);
+                    element.Password = passwordHash;
+                }
+                else {
+                    element.Password = "";
+                }
             }
-            else {
-                element.Password = "";
-            }
-
         }
         return await new UserRepository().updateAuthType(id, auth);
     }

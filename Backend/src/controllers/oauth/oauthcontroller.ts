@@ -34,7 +34,7 @@ export class OAuthController implements Controller {
     facebookOAuth = async (req: express.Request, res: express.Response) => {
         let user = req.user as User;
         const token = this.signToken(user);
-        res.status(200).json({ newUser: req.authInfo || false, sucess: true, token });
+        res.status(200).json({ addUser: req.authInfo || false, sucess: true, token });
     }
 
     // add this callback for handling errors. Then you can set responses with codes or 

@@ -57,7 +57,6 @@ CREATE TABLE [dbo].[User](
 	[CPF] [varchar](14) NULL,
 	[RG] [varchar](14) NULL,
 	[Name] [varchar](50) NULL,
-	[Email] [varchar](100) NULL,
 	[Birthday] [smalldatetime] NULL,
 	[Mobile] [varchar] (14),
 	[Phone] [varchar] (14),

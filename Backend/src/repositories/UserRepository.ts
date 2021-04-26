@@ -54,7 +54,7 @@ export class UserRepository {
             addresses.push(address);
         }
 
-        return new User(Id, Name, Cpf, RG, Bithday, Mobile, Phone, Email, UpdateDate, authType, addresses);
+        return new User(Id, Name, Cpf, RG, Bithday, Mobile, Phone, UpdateDate, authType, addresses);
     }
 
     private async CreateUpdateUser(user: User, update: Boolean): Promise<number | null> {
@@ -74,7 +74,6 @@ export class UserRepository {
             }
             reqAdd.input("Name", sql.VarChar(50), user.Name);
             reqAdd.input("Cpf", sql.VarChar(100), user.Cpf);
-            reqAdd.input("Email", sql.VarChar(100), user.Email);
             reqAdd.input("RG", sql.VarChar(14), user.Rg);
             reqAdd.input("Birthday", sql.DateTime, user.Birthday);
             reqAdd.input("Mobile", sql.VarChar(14), user.Mobile);

@@ -6,6 +6,7 @@ import { UserService } from '../../services/userservice';
 import { ValidarCpf } from '../../infra/util';
 import passport from 'passport';
 import logger from '../../infra/logger';
+import validator from 'validator';
 
 const passportJWT = passport.authenticate('jwt', { session: false });
 
@@ -35,7 +36,7 @@ class UserController implements Controller {
             .exists({ checkNull: true, checkFalsy: true })
             .withMessage("Tipo de Autenticação é de preenchimento Obrigatório"),
         check("authType.*.password")
-            .custom(async (password, meta) => {
+            .custom(async (_, meta) => {
                 let index = meta.path.substring(meta.path.indexOf('[') + 1, meta.path.indexOf(']'));
                 const { authType } = meta.req.body;
                 if (authType[index].type == AUTHTYPE.PASSWORD) {
@@ -51,6 +52,24 @@ class UserController implements Controller {
                     }
                 }
             }),
+        check("authType.*.email")
+            .custom(async (_, meta) => {
+                let index = meta.path.substring(meta.path.indexOf('[') + 1, meta.path.indexOf(']'));
+                const { authType } = meta.req.body;
+                if (authType[index].type == AUTHTYPE.PASSWORD) {
+                    let email = authType[index].email;
+                    if (!email) {
+                        return new Promise((_, reject) => {
+                            reject("Email é de preenchimento obrigatório")
+                        });
+                    }
+                    if (!validator.isEmail(email)) {
+                        return new Promise((_, reject) => {
+                            reject("Email inválido")
+                        })
+                    }
+                }
+            }),
         check("authType.*.type")
             .isIn(["P", "F", "G"])
             .withMessage("Tipo de Autenticação Inválido - 'P', 'F' ou 'G'"),
@@ -59,10 +78,6 @@ class UserController implements Controller {
         check('name')
             .exists({ checkNull: true, checkFalsy: true })
             .withMessage('O nome é de preenchimento obrigatório'),
-        check('email')
-            .isEmail()
-            .normalizeEmail()
-            .withMessage('E-mail inválido'),
         check('cpf')
             .exists({ checkNull: true, checkFalsy: true })
             .withMessage("CPF é de preenchimento obrigatório")
@@ -212,7 +227,7 @@ class UserController implements Controller {
     }
 
     private BodyToUser(body: any): any {
-        const { id, name, cpf, rg, birthday, mobile, phone, email, authType, addresses } = body;
+        const { id, name, cpf, rg, birthday, mobile, phone, authType, addresses } = body;
 
         let types = new Array<AuthTypeUser>();
         for (let index = 0; index < authType.length; index++) {
@@ -233,23 +248,43 @@ class UserController implements Controller {
             addr.push(new AddressUser(addressType, zip, address, number, complement, district, city, state, reference));
         }
 
-        return new User(id, name, cpf, rg, new Date(birthday), mobile, phone, email, undefined, types, addr);
+        return new User(id, name, cpf, rg, new Date(birthday), mobile, phone, undefined, types, addr);
     }
 
+    private async EmailNotFind(body: any, update: boolean = false): Promise<boolean> {
+        if (body.authType) {
+            for (let index = 0; index < body.authType.length; index++) {
+                const { email } = body.authType[index];
+                const userEmail = await new UserService().findByEmail(email);
+                if (!update) {
+                    if (userEmail)
+                        return true;
+                }
+                else {
+                    if (userEmail && userEmail.Id != body.id) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
     create = async (req: express.Request, res: express.Response) => {
-        const userEmail = await new UserService().findByEmail(req.body.email);
-        if (userEmail) {
+        const schemaErrors = validationResult(req);
+        if (!schemaErrors.isEmpty()) {
+            return res.status(500).send(schemaErrors.array());
+        }
+        if (await this.EmailNotFind(req.body)) {
             return res.status(500).send({ msg: "E-mail já cadastrado", param: "email", location: "body" });
         }
+
         const userCpf = await new UserService().findByCpf(req.body.cpf);
         if (userCpf) {
             return res.status(500).send({ msg: "CPF já cadastrado", param: "cpf", location: "body" });
         }
 
-        const schemaErrors = validationResult(req);
-        if (!schemaErrors.isEmpty()) {
-            return res.status(500).send(schemaErrors.array());
-        }
         try {
             let user = this.BodyToUser(req.body);
             new UserService().create(user).
@@ -272,8 +307,7 @@ class UserController implements Controller {
         if (!schemaErrors.isEmpty()) {
             return res.status(500).send(schemaErrors.array());
         }
-        const userEmail = await new UserService().findByEmail(req.body.email);
-        if (userEmail && userEmail.Id != req.body.id) {
+        if (await this.EmailNotFind(req.body, true)) {
             return res.status(500).send({ msg: "E-mail já cadastrado", param: "email", location: "body" });
         }
         const userCpf = await new UserService().findByCpf(req.body.cpf);

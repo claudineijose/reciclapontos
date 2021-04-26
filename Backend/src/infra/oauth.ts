@@ -55,12 +55,11 @@ export class OAuth {
         }, async (req, accessToken, refreshToken, profile, done) => {
             try {
                 let email = profile.emails[0].value;
-                let user = await new UserService().getUserByAuthType(email, AUTHTYPE.FACEBOOK);
+                let user = await new UserService().findByEmail(email);
                 //se não encontrou crio um usuario novo
                 if (!user) {
                     let newUser = new User();
                     newUser.Name = profile.displayName;
-                    newUser.Email = email;
                     let auth = new AuthTypeUser(AUTHTYPE.FACEBOOK, "", profile.id, email);
                     newUser.AuthType.push(auth);
 
@@ -68,7 +67,18 @@ export class OAuth {
                     newUser.Id = id || 0;
 
                     req.user = newUser || undefined;
-                    return done(null, newUser, { newUser: true })
+                    return done(null, user, { addUser: true })
+                }
+                else {
+                    const auth = user.AuthType.find(f => f.Type == AUTHTYPE.FACEBOOK);
+                    if (!auth) {
+                        let authNew = new AuthTypeUser(AUTHTYPE.FACEBOOK, "", profile.id, email, user.Id);
+                        user.AuthType.push(authNew);
+                        await new UserService().updateAuthType(user.Id, user.AuthType, false);
+
+                        req.user = user || undefined;
+                        return done(null, user, { addUser: true })
+                    }
                 }
                 req.user = user;
                 done(null, user);

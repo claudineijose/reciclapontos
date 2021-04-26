@@ -58,7 +58,6 @@ export class User {
     Birthday: Date | undefined;
     Mobile: string;
     Phone: string;
-    Email: string;
     UpdateDate: Date | undefined;
     AuthType: Array<AuthTypeUser>;
     Addresses: Array<AddressUser>;
@@ -66,7 +65,7 @@ export class User {
 
     constructor(id?: number, name?: string, cpf?: string,
         rg?: string, birthday?: Date, mobile?: string, phone?: string,
-        email?: string, updateDate?: Date,
+        updateDate?: Date,
         authType?: Array<AuthTypeUser>,
         addresses?: Array<AddressUser>) {
         this.Id = id || 0;
@@ -76,7 +75,6 @@ export class User {
         this.Rg = rg || "";
         this.Mobile = mobile || "";
         this.Phone = phone || "";
-        this.Email = email || "";
         this.UpdateDate = updateDate || undefined;
         this.AuthType = authType || new Array<AuthTypeUser>();
         this.Addresses = addresses || new Array<AddressUser>();

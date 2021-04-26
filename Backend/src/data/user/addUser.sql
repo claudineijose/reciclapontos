@@ -2,7 +2,6 @@ INSERT INTO [dbo].[User]
 (
     [Name]
     ,[Cpf]
-    ,[Email]
     ,[UpdateDate]
     ,[RG]
     ,[Birthday]
@@ -13,7 +12,6 @@ VALUES
 (
     @Name
     ,@Cpf
-    ,@Email
     ,GETDATE()
     ,@RG
     ,@Birthday
